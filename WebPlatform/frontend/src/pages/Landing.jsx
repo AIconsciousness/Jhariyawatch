@@ -169,11 +169,11 @@ const Landing = () => {
 
         {/* Stats */}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {stats.map((stat, index) => (
-              <div key={index} className="bg-white/10 backdrop-blur-md rounded-xl p-6 text-center">
-                <div className="text-4xl font-bold text-white mb-2">{stat.value}</div>
-                <div className="text-gray-200">{stat.label}</div>
+              <div key={index} className="bg-white/10 backdrop-blur-md rounded-xl p-4 md:p-6 text-center">
+                <div className="text-2xl md:text-4xl font-bold text-white mb-1 md:mb-2">{stat.value}</div>
+                <div className="text-xs md:text-base text-gray-200">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -427,23 +427,23 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 text-white py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-5 gap-8 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 md:gap-8 mb-6 md:mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <img src="/logo.png" alt="JhariaWatch" className="w-10 h-10 rounded-lg" />
                 <span className="text-xl font-bold">JhariaWatch</span>
               </div>
-              <p className="text-gray-400">
+              <p className="text-sm md:text-base text-gray-400">
                 {language === 'hi'
                   ? 'झरिया में सुरक्षा और निगरानी के लिए आपका विश्वसनीय साथी'
                   : 'Your trusted partner for safety and monitoring in Jharia'}
               </p>
             </div>
             <div>
-              <h4 className="font-bold mb-4">{language === 'hi' ? 'त्वरित लिंक' : 'Quick Links'}</h4>
-              <ul className="space-y-2 text-gray-400">
+              <h4 className="font-bold mb-3 md:mb-4 text-sm md:text-base">{language === 'hi' ? 'त्वरित लिंक' : 'Quick Links'}</h4>
+              <ul className="space-y-2 text-sm md:text-base text-gray-400">
                 <li><a href="#features" className="hover:text-white transition">{language === 'hi' ? 'सुविधाएं' : 'Features'}</a></li>
                 <li><a href="#about" className="hover:text-white transition">{language === 'hi' ? 'परिचय' : 'About'}</a></li>
                 <li><a href="#technology" className="hover:text-white transition">{language === 'hi' ? 'तकनीक' : 'Technology'}</a></li>
@@ -451,8 +451,8 @@ const Landing = () => {
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-4">{language === 'hi' ? 'सहायता' : 'Support'}</h4>
-              <ul className="space-y-2 text-gray-400">
+              <h4 className="font-bold mb-3 md:mb-4 text-sm md:text-base">{language === 'hi' ? 'सहायता' : 'Support'}</h4>
+              <ul className="space-y-2 text-sm md:text-base text-gray-400">
                 <li><Link to="/login" className="hover:text-white transition">{language === 'hi' ? 'लॉगिन' : 'Login'}</Link></li>
                 <li><Link to="/register" className="hover:text-white transition">{language === 'hi' ? 'रजिस्टर' : 'Register'}</Link></li>
                 <li><a href="#" className="hover:text-white transition">{language === 'hi' ? 'सहायता केंद्र' : 'Help Center'}</a></li>
@@ -460,16 +460,16 @@ const Landing = () => {
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-4">{language === 'hi' ? 'कानूनी' : 'Legal'}</h4>
-              <ul className="space-y-2 text-gray-400">
+              <h4 className="font-bold mb-3 md:mb-4 text-sm md:text-base">{language === 'hi' ? 'कानूनी' : 'Legal'}</h4>
+              <ul className="space-y-2 text-sm md:text-base text-gray-400">
                 <li><Link to="/privacy-policy" className="hover:text-white transition">{language === 'hi' ? 'गोपनीयता नीति' : 'Privacy Policy'}</Link></li>
                 <li><Link to="/terms-of-service" className="hover:text-white transition">{language === 'hi' ? 'सेवा की शर्तें' : 'Terms of Service'}</Link></li>
                 <li><Link to="/cookie-policy" className="hover:text-white transition">{language === 'hi' ? 'कुकी नीति' : 'Cookie Policy'}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-4">{language === 'hi' ? 'आपातकालीन' : 'Emergency'}</h4>
-              <div className="space-y-2 text-gray-400">
+              <h4 className="font-bold mb-3 md:mb-4 text-sm md:text-base">{language === 'hi' ? 'आपातकालीन' : 'Emergency'}</h4>
+              <div className="space-y-2 text-sm md:text-base text-gray-400">
                 <p className="flex items-center gap-2">
                   <Phone className="w-4 h-4" />
                   <span>1800-xxx-xxxx</span>
@@ -480,7 +480,7 @@ const Landing = () => {
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
+          <div className="border-t border-gray-800 pt-6 md:pt-8 text-center text-sm md:text-base text-gray-400">
             <p>&copy; 2024 JhariaWatch. {language === 'hi' ? 'सर्वाधिकार सुरक्षित।' : 'All rights reserved.'}</p>
           </div>
         </div>

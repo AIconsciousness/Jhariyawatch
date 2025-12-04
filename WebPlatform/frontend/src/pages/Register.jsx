@@ -84,20 +84,29 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-primary-dark to-primary-light flex flex-col">
-      <div className="absolute top-4 right-4">
-        <LanguageToggle className="text-white" />
-      </div>
+    <div className="min-h-screen relative flex flex-col">
+      {/* Background Image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: 'url(/images/mining.jpg)' }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-900/90 via-red-900/85 to-orange-800/90" />
 
-      <div className="flex-1 flex flex-col justify-center px-6 py-8">
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white/10 rounded-full mb-3">
-            <MapPin className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-white">{t('app.name')}</h1>
+      {/* Content */}
+      <div className="relative z-10">
+        <div className="absolute top-4 right-4">
+          <LanguageToggle className="text-white" />
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-6 max-w-md mx-auto w-full">
+        <div className="min-h-screen flex flex-col justify-center px-6 py-8">
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-white/10 backdrop-blur-sm rounded-full mb-3">
+              <img src="/logo.png" alt="JhariaWatch" className="w-14 h-14 rounded-full" />
+            </div>
+            <h1 className="text-2xl font-bold text-white">{t('app.name')}</h1>
+          </div>
+
+        <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-6 max-w-md mx-auto w-full">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
             {t('auth.registerTitle')}
           </h2>
@@ -302,6 +311,7 @@ const Register = () => {
               {t('auth.login')}
             </Link>
           </p>
+        </div>
         </div>
       </div>
     </div>

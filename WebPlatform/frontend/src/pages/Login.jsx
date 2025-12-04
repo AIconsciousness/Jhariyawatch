@@ -35,19 +35,28 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary via-primary-dark to-primary-light flex flex-col">
-      <div className="absolute top-4 right-4">
-        <LanguageToggle className="text-white" />
-      </div>
+    <div className="min-h-screen relative flex flex-col">
+      {/* Background Image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: 'url(/images/coalfield.jpg)' }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-red-900/90 via-orange-900/85 to-red-800/90" />
 
-      <div className="flex-1 flex flex-col justify-center px-6 py-12">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white/10 rounded-full mb-4">
-            <MapPin className="w-10 h-10 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-white">{t('app.name')}</h1>
-          <p className="text-white/70 mt-2">{t('app.tagline')}</p>
+      {/* Content */}
+      <div className="relative z-10">
+        <div className="absolute top-4 right-4">
+          <LanguageToggle className="text-white" />
         </div>
+
+        <div className="min-h-screen flex flex-col justify-center px-6 py-12">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-white/10 backdrop-blur-sm rounded-full mb-4">
+              <img src="/logo.png" alt="JhariaWatch" className="w-16 h-16 rounded-full" />
+            </div>
+            <h1 className="text-3xl font-bold text-white">{t('app.name')}</h1>
+            <p className="text-white/90 mt-2 font-medium">{t('app.tagline')}</p>
+          </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-6 max-w-md mx-auto w-full">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
@@ -121,6 +130,7 @@ const Login = () => {
               {t('auth.register')}
             </Link>
           </p>
+        </div>
         </div>
       </div>
     </div>
