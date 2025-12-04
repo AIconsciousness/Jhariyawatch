@@ -25,34 +25,50 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Log successful responses in development
+    if (import.meta.env.DEV) {
+      console.log('✅ API Response:', {
+        url: response.config?.url,
+        status: response.status,
+        data: response.data
+      });
+    }
+    return response;
+  },
   (error) => {
     // Log all errors for debugging
     if (error.response) {
       // Server responded with error status
-      console.error('API Error Response:', {
+      console.error('❌ API Error Response:', {
         status: error.response.status,
+        statusText: error.response.statusText,
         data: error.response.data,
         url: error.config?.url,
-        method: error.config?.method
+        method: error.config?.method,
+        headers: error.response.headers
       });
     } else if (error.request) {
       // Request made but no response received (network error, CORS, etc.)
-      console.error('API Network Error:', {
+      console.error('❌ API Network Error:', {
         message: error.message,
         url: error.config?.url,
         method: error.config?.method,
-        hint: 'Backend server might not be running or CORS issue'
+        request: error.request,
+        hint: 'Backend server might not be running, CORS issue, or network problem'
       });
     } else {
       // Something else happened
-      console.error('API Error:', error.message);
+      console.error('❌ API Error:', error.message, error);
     }
     
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      // Don't redirect on login/register pages
+      if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

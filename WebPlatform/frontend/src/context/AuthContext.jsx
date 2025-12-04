@@ -40,17 +40,37 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       console.log('🔐 Login attempt:', { email });
       const response = await api.post('/auth/login', { email, password });
-      console.log('✅ Login response:', response.data);
+      console.log('✅ Login response:', JSON.stringify(response.data, null, 2));
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
       
-      if (response.data.success) {
-        const { token, user: userData } = response.data.data;
+      // Check response structure
+      if (!response || !response.data) {
+        console.error('❌ Invalid response structure:', response);
+        return { 
+          success: false, 
+          error: { message: { en: 'Invalid server response', hi: 'अमान्य सर्वर प्रतिक्रिया' } } 
+        };
+      }
+      
+      if (response.data.success === true) {
+        const { token, user: userData } = response.data.data || {};
+        if (!token || !userData) {
+          console.error('❌ Missing token or user data:', response.data);
+          return { 
+            success: false, 
+            error: { message: { en: 'Missing authentication data', hi: 'प्रमाणीकरण डेटा गुम है' } } 
+          };
+        }
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(userData));
         setUser(userData);
         return { success: true };
       }
-      console.warn('⚠️ Login failed - response not successful:', response.data);
-      return { success: false, error: response.data.error };
+      
+      console.warn('⚠️ Login failed - response not successful:', JSON.stringify(response.data, null, 2));
+      const error = response.data.error || { message: { en: 'Login failed', hi: 'लॉगिन विफल' } };
+      return { success: false, error };
     } catch (err) {
       console.error('❌ Login error:', err);
       console.error('Error details:', {
@@ -71,7 +91,18 @@ export const AuthProvider = ({ children }) => {
       }
       
       // Server error response
-      const errorMsg = err.response?.data?.error?.message || { en: 'Login failed', hi: 'लॉगिन विफल' };
+      let errorMsg = { en: 'Login failed', hi: 'लॉगिन विफल' };
+      
+      if (err.response?.data) {
+        if (err.response.data.error) {
+          errorMsg = err.response.data.error.message || errorMsg;
+        } else if (err.response.data.message) {
+          errorMsg = typeof err.response.data.message === 'string' 
+            ? { en: err.response.data.message, hi: err.response.data.message }
+            : err.response.data.message;
+        }
+      }
+      
       setError(errorMsg);
       return { success: false, error: { message: errorMsg } };
     }
@@ -82,17 +113,37 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       console.log('📝 Register attempt:', { email: userData.email, name: userData.name });
       const response = await api.post('/auth/register', userData);
-      console.log('✅ Register response:', response.data);
+      console.log('✅ Register response:', JSON.stringify(response.data, null, 2));
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
       
-      if (response.data.success) {
-        const { token, user: newUser } = response.data.data;
+      // Check response structure
+      if (!response || !response.data) {
+        console.error('❌ Invalid response structure:', response);
+        return { 
+          success: false, 
+          error: { message: { en: 'Invalid server response', hi: 'अमान्य सर्वर प्रतिक्रिया' } } 
+        };
+      }
+      
+      if (response.data.success === true) {
+        const { token, user: newUser } = response.data.data || {};
+        if (!token || !newUser) {
+          console.error('❌ Missing token or user data:', response.data);
+          return { 
+            success: false, 
+            error: { message: { en: 'Missing authentication data', hi: 'प्रमाणीकरण डेटा गुम है' } } 
+          };
+        }
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(newUser));
         setUser(newUser);
         return { success: true };
       }
-      console.warn('⚠️ Registration failed - response not successful:', response.data);
-      return { success: false, error: response.data.error };
+      
+      console.warn('⚠️ Registration failed - response not successful:', JSON.stringify(response.data, null, 2));
+      const error = response.data.error || { message: { en: 'Registration failed', hi: 'पंजीकरण विफल' } };
+      return { success: false, error };
     } catch (err) {
       console.error('❌ Registration error:', err);
       console.error('Error details:', {
@@ -113,7 +164,18 @@ export const AuthProvider = ({ children }) => {
       }
       
       // Server error response
-      const errorMsg = err.response?.data?.error?.message || { en: 'Registration failed', hi: 'पंजीकरण विफल' };
+      let errorMsg = { en: 'Registration failed', hi: 'पंजीकरण विफल' };
+      
+      if (err.response?.data) {
+        if (err.response.data.error) {
+          errorMsg = err.response.data.error.message || errorMsg;
+        } else if (err.response.data.message) {
+          errorMsg = typeof err.response.data.message === 'string' 
+            ? { en: err.response.data.message, hi: err.response.data.message }
+            : err.response.data.message;
+        }
+      }
+      
       setError(errorMsg);
       return { success: false, error: { message: errorMsg } };
     }

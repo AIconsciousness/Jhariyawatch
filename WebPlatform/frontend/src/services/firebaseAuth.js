@@ -7,15 +7,16 @@ let recaptchaVerifier = null;
 
 export const initializeFirebase = async () => {
   try {
-    // Dynamic import - only load Firebase when config is available
-    const { initializeApp } = await import('firebase/app');
-    const { getAuth, GoogleAuthProvider, RecaptchaVerifier } = await import('firebase/auth');
     const { firebaseConfig, isFirebaseConfigured } = await import('../config/firebase');
     
     if (!isFirebaseConfigured()) {
-      console.warn('Firebase not configured yet. Please add API keys.');
+      // Silent fail - don't show error in console for production
       return false;
     }
+
+    // Dynamic import - only load Firebase when config is available
+    const { initializeApp } = await import('firebase/app');
+    const { getAuth, GoogleAuthProvider, RecaptchaVerifier } = await import('firebase/auth');
 
     const app = initializeApp(firebaseConfig);
     auth = getAuth(app);
@@ -29,7 +30,7 @@ export const initializeFirebase = async () => {
     console.log('✅ Firebase initialized successfully');
     return true;
   } catch (error) {
-    console.error('❌ Firebase initialization error:', error);
+    // Silent fail in production
     return false;
   }
 };
@@ -40,7 +41,13 @@ export const signInWithGoogle = async () => {
     if (!auth) {
       const initialized = await initializeFirebase();
       if (!initialized) {
-        throw new Error('Firebase not configured');
+        return {
+          success: false,
+          error: {
+            code: 'FIREBASE_NOT_CONFIGURED',
+            message: { en: 'Google Sign In is not available. Please use email registration.', hi: 'Google साइन इन उपलब्ध नहीं है। कृपया ईमेल पंजीकरण का उपयोग करें।' }
+          }
+        };
       }
     }
 
