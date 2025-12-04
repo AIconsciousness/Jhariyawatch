@@ -68,7 +68,7 @@ const Login = () => {
             <p className="text-white/90 mt-2 font-medium">{t('app.tagline')}</p>
           </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-6 max-w-md mx-auto w-full">
+          <div className="bg-white rounded-2xl shadow-xl p-6 max-w-md mx-auto w-full">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
             {t('auth.loginTitle')}
           </h2>

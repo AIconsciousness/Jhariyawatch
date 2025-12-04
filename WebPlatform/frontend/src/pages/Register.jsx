@@ -116,7 +116,7 @@ const Register = () => {
             <h1 className="text-2xl font-bold text-white">{t('app.name')}</h1>
           </div>
 
-        <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-6 max-w-md mx-auto w-full">
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-6 max-w-md mx-auto w-full">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
             {t('auth.registerTitle')}
           </h2>
