@@ -42,7 +42,7 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={user && !loading ? <Navigate to="/dashboard" replace /> : <Landing />} />
+      <Route path="/" element={<Landing />} />
       <Route path="/login" element={user && !loading ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/register" element={user && !loading ? <Navigate to="/dashboard" replace /> : <Register />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />

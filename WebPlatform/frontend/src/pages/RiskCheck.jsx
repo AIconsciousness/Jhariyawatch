@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../context/LanguageContext';
-import { MapPin, AlertTriangle, Shield, TrendingDown, Navigation, Satellite } from 'lucide-react';
+import { MapPin, AlertTriangle, Shield, TrendingDown, Navigation, Satellite, Search, ChevronDown } from 'lucide-react';
 import RiskMap from '../components/RiskMap';
 import RiskBadge from '../components/RiskBadge';
+import DetailedSubsidenceChart from '../components/DetailedSubsidenceChart';
+import { useSubsidenceNotifications } from '../hooks/useSubsidenceNotifications';
 import { riskAPI } from '../services/api';
+import { jhariaPlaces, getPlaceByCoordinates, generatePlaceTimeSeries } from '../data/jhariaPlaces';
 
 const RiskCheck = () => {
   const { t } = useTranslation();
@@ -12,12 +15,26 @@ const RiskCheck = () => {
   
   const [userLocation, setUserLocation] = useState(null);
   const [riskData, setRiskData] = useState(null);
+  const [selectedPlace, setSelectedPlace] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [chartData, setChartData] = useState([]);
+  const [showPlaceSelector, setShowPlaceSelector] = useState(false);
 
   useEffect(() => {
     checkUserLocation();
   }, []);
+
+  useEffect(() => {
+    if (selectedPlace) {
+      // Generate chart data for selected place
+      const data = generatePlaceTimeSeries(selectedPlace, 12);
+      setChartData(data);
+      
+      // Fetch risk data for selected place coordinates
+      fetchRiskData(selectedPlace.coordinates.lat, selectedPlace.coordinates.lng);
+    }
+  }, [selectedPlace]);
 
   const checkUserLocation = () => {
     setLoading(true);
@@ -31,17 +48,29 @@ const RiskCheck = () => {
             lng: position.coords.longitude
           };
           setUserLocation(loc);
-          await fetchRiskData(loc.lat, loc.lng);
+          
+          // Find nearest place
+          const nearestPlace = getPlaceByCoordinates(loc.lat, loc.lng);
+          if (nearestPlace && nearestPlace.distance < 5) { // Within 5km
+            setSelectedPlace(nearestPlace);
+          } else {
+            await fetchRiskData(loc.lat, loc.lng);
+          }
         },
         (err) => {
-          setUserLocation({ lat: 23.767, lng: 86.396 });
-          fetchRiskData(23.767, 86.396);
+          // Default to Alkusa (most critical area)
+          const defaultPlace = jhariaPlaces.find(p => p.id === 'alkusa');
+          setUserLocation(defaultPlace.coordinates);
+          setSelectedPlace(defaultPlace);
+          fetchRiskData(defaultPlace.coordinates.lat, defaultPlace.coordinates.lng);
         },
         { enableHighAccuracy: true, timeout: 10000 }
       );
     } else {
-      setError(language === 'hi' ? 'जियोलोकेशन उपलब्ध नहीं है' : 'Geolocation not available');
-      setLoading(false);
+      const defaultPlace = jhariaPlaces.find(p => p.id === 'alkusa');
+      setUserLocation(defaultPlace.coordinates);
+      setSelectedPlace(defaultPlace);
+      fetchRiskData(defaultPlace.coordinates.lat, defaultPlace.coordinates.lng);
     }
   };
 
@@ -59,6 +88,20 @@ const RiskCheck = () => {
     }
   };
 
+  const handlePlaceSelect = (place) => {
+    setSelectedPlace(place);
+    setShowPlaceSelector(false);
+    setUserLocation(place.coordinates);
+    setLoading(true);
+    
+    // Generate chart data immediately
+    const data = generatePlaceTimeSeries(place, 12);
+    setChartData(data);
+    
+    // Fetch risk data
+    fetchRiskData(place.coordinates.lat, place.coordinates.lng);
+  };
+
   const getRiskColor = (level) => {
     const colors = {
       critical: '#dc2626',
@@ -70,7 +113,7 @@ const RiskCheck = () => {
     return colors[level] || '#6b7280';
   };
 
-  if (loading) {
+  if (loading && !selectedPlace) {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
         <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -79,8 +122,12 @@ const RiskCheck = () => {
     );
   }
 
-  const riskLevel = riskData?.riskAssessment?.zone?.riskLevel || riskData?.riskAssessment?.riskLevel || 'stable';
+  const riskLevel = selectedPlace?.riskLevel || riskData?.riskAssessment?.zone?.riskLevel || riskData?.riskAssessment?.riskLevel || 'stable';
   const riskColor = getRiskColor(riskLevel);
+  const zoneId = riskData?.riskAssessment?.zone?.zoneId || selectedPlace?.id;
+
+  // Enable notifications for dangerous subsidence
+  useSubsidenceNotifications(zoneId, chartData);
 
   return (
     <div className="min-h-screen bg-gray-100 pb-24">
@@ -88,31 +135,106 @@ const RiskCheck = () => {
         <h1 className="text-xl font-bold text-gray-800">{t('risk.title')}</h1>
       </div>
 
+      {/* Place Selector */}
+      <div className="px-4 mt-4">
+        <div className="relative">
+          <button
+            onClick={() => setShowPlaceSelector(!showPlaceSelector)}
+            className="w-full bg-white p-4 rounded-xl shadow-sm flex items-center justify-between hover:shadow-md transition"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-full">
+                <Search className="w-5 h-5 text-blue-600" />
+              </div>
+              <div className="text-left">
+                <p className="text-xs text-gray-500">{language === 'hi' ? 'क्षेत्र चुनें' : 'Select Area'}</p>
+                <p className="font-semibold text-gray-800">
+                  {selectedPlace 
+                    ? (selectedPlace.name[language] || selectedPlace.name.en)
+                    : (language === 'hi' ? 'क्षेत्र चुनें' : 'Select an area')
+                  }
+                </p>
+              </div>
+            </div>
+            <ChevronDown className={`w-5 h-5 text-gray-400 transition ${showPlaceSelector ? 'rotate-180' : ''}`} />
+          </button>
+
+          {showPlaceSelector && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg z-50 max-h-96 overflow-y-auto">
+              {jhariaPlaces.map((place) => (
+                <button
+                  key={place.id}
+                  onClick={() => handlePlaceSelect(place)}
+                  className="w-full p-4 text-left hover:bg-gray-50 border-b border-gray-100 last:border-0 transition"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-gray-800">
+                        {place.name[language] || place.name.en}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {place.coordinates.lat.toFixed(4)}°N, {place.coordinates.lng.toFixed(4)}°E
+                      </p>
+                    </div>
+                    <RiskBadge level={place.riskLevel} size="sm" />
+                  </div>
+                  <p className="text-xs text-gray-600 mt-2 line-clamp-2">
+                    {place.description[language] || place.description.en}
+                  </p>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Location Display */}
       {userLocation && (
         <div className="bg-white mx-4 mt-4 p-4 rounded-xl shadow-sm flex items-center gap-3">
           <div className="p-2 bg-blue-100 rounded-full">
             <MapPin className="w-5 h-5 text-blue-600" />
           </div>
-          <div>
+          <div className="flex-1">
             <p className="text-xs text-gray-500">{t('risk.yourLocation')}</p>
             <p className="font-medium text-gray-800">
               {userLocation.lat.toFixed(4)}°N, {userLocation.lng.toFixed(4)}°E
             </p>
+            {selectedPlace && (
+              <p className="text-xs text-gray-500 mt-1">
+                {language === 'hi' ? 'निकटतम क्षेत्र:' : 'Nearest Area:'} {selectedPlace.name[language] || selectedPlace.name.en}
+              </p>
+            )}
           </div>
           <button 
             onClick={checkUserLocation}
-            className="ml-auto p-2 text-blue-600 hover:bg-blue-50 rounded-full"
+            className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition"
+            title={language === 'hi' ? 'स्थान अपडेट करें' : 'Update Location'}
           >
             <Navigation className="w-5 h-5" />
           </button>
         </div>
       )}
 
+      {/* Map */}
       <div className="px-4 mt-4">
-        <RiskMap userLocation={userLocation} height="220px" />
+        <RiskMap 
+          userLocation={userLocation} 
+          height="250px"
+          onZoneClick={(zone) => {
+            // Find matching place
+            const place = jhariaPlaces.find(p => 
+              p.name.en.toLowerCase().includes(zone.zoneName?.en?.toLowerCase() || '') ||
+              p.name.hi.includes(zone.zoneName?.hi || '')
+            );
+            if (place) {
+              handlePlaceSelect(place);
+            }
+          }}
+        />
       </div>
 
-      {riskData && (
+      {/* Risk Assessment Card */}
+      {selectedPlace && (
         <>
           <div 
             className="mx-4 mt-4 p-6 rounded-xl text-center"
@@ -125,61 +247,60 @@ const RiskCheck = () => {
             <p className="text-3xl font-bold mb-2" style={{ color: riskColor }}>
               {t(`risk.${riskLevel}`)}
             </p>
-            {riskData.riskAssessment?.zone && (
-              <p className="text-sm text-gray-600 mb-2">
-                {riskData.riskAssessment.zone.zoneName?.[language] || riskData.riskAssessment.zone.zoneName?.en}
-              </p>
-            )}
+            <p className="text-sm text-gray-600 mb-2 font-medium">
+              {selectedPlace.name[language] || selectedPlace.name.en}
+            </p>
             <RiskBadge level={riskLevel} size="lg" />
-            {riskData.riskAssessment?.riskScore && (
-              <div className="mt-3 text-sm text-gray-500">
-                Score: <span className="font-bold" style={{ color: riskColor }}>{riskData.riskAssessment.riskScore}/100</span>
-              </div>
-            )}
           </div>
 
-          {riskData.riskAssessment?.subsidenceData && (
-            <div className="bg-white mx-4 mt-4 p-4 rounded-xl shadow-sm">
-              <div className="flex items-center gap-2 mb-3">
-                <Satellite className="w-5 h-5 text-primary" />
-                <h3 className="font-bold text-gray-800">PSInSAR Data</h3>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <div className="flex items-center gap-2 text-gray-500 text-xs mb-1">
-                    <TrendingDown className="w-4 h-4" />
-                    {t('risk.subsidenceRate')}
-                  </div>
-                  <p className="text-xl font-bold" style={{ color: riskColor }}>
-                    {riskData.riskAssessment.subsidenceData.averageRate} mm
-                    <span className="text-sm font-normal text-gray-500">/{t('risk.perYear')}</span>
-                  </p>
-                </div>
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <div className="text-gray-500 text-xs mb-1">{t('risk.displacement')}</div>
-                  <p className="text-xl font-bold text-gray-800">
-                    {riskData.riskAssessment.subsidenceData.cumulativeDisplacement} mm
-                  </p>
-                </div>
-              </div>
-              {riskData.riskAssessment.psinsar && (
-                <div className="mt-3 flex justify-between text-sm text-gray-500">
-                  <span>{t('risk.coherence')}: <span className="font-medium text-gray-700">{(riskData.riskAssessment.psinsar.coherence * 100).toFixed(0)}%</span></span>
-                  <span>Source: Sentinel-1</span>
-                </div>
-              )}
+          {/* PS-InSAR Data */}
+          <div className="bg-white mx-4 mt-4 p-4 rounded-xl shadow-sm">
+            <div className="flex items-center gap-2 mb-3">
+              <Satellite className="w-5 h-5 text-primary" />
+              <h3 className="font-bold text-gray-800">
+                {language === 'hi' ? 'PS-InSAR डेटा' : 'PS-InSAR Data'}
+              </h3>
             </div>
-          )}
-
-          {riskData.riskAssessment?.riskDescription && (
-            <div className="bg-white mx-4 mt-4 p-4 rounded-xl shadow-sm">
-              <p className="text-gray-700 leading-relaxed">
-                {riskData.riskAssessment.riskDescription[language] || riskData.riskAssessment.riskDescription.en}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <div className="flex items-center gap-2 text-gray-500 text-xs mb-1">
+                  <TrendingDown className="w-4 h-4" />
+                  {t('risk.subsidenceRate')}
+                </div>
+                <p className="text-xl font-bold" style={{ color: riskColor }}>
+                  {selectedPlace.baseSubsidenceRate} mm
+                  <span className="text-sm font-normal text-gray-500">/{t('risk.perYear')}</span>
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {language === 'hi' ? 'अधिकतम:' : 'Max:'} {selectedPlace.maxRate} mm/yr
+                </p>
+              </div>
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <div className="text-gray-500 text-xs mb-1">{t('risk.displacement')}</div>
+                <p className="text-xl font-bold text-gray-800">
+                  {selectedPlace.cumulativeDisplacement} mm
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {language === 'hi' ? 'संचयी' : 'Cumulative'}
+                </p>
+              </div>
+            </div>
+            <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+              <p className="text-xs text-gray-600 leading-relaxed">
+                {selectedPlace.description[language] || selectedPlace.description.en}
               </p>
             </div>
+          </div>
+
+          {/* Detailed Chart */}
+          {selectedPlace && chartData.length > 0 && (
+            <div className="mx-4 mt-4">
+              <DetailedSubsidenceChart place={selectedPlace} height={450} />
+            </div>
           )}
 
-          {riskData.safetyRecommendations && (
+          {/* Safety Recommendations */}
+          {riskData?.safetyRecommendations && (
             <div className="mx-4 mt-4">
               <h3 className="text-lg font-bold text-gray-800 mb-3">{t('risk.recommendations')}</h3>
               <div className="space-y-2">
@@ -195,7 +316,8 @@ const RiskCheck = () => {
             </div>
           )}
 
-          {riskData.nearestSafeZone && (
+          {/* Nearest Safe Zone */}
+          {riskData?.nearestSafeZone && (
             <div className="mx-4 mt-4 p-4 bg-green-50 rounded-xl border border-green-200">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-green-100 rounded-full">
@@ -214,6 +336,14 @@ const RiskCheck = () => {
             </div>
           )}
         </>
+      )}
+
+      {/* Error Display */}
+      {error && (
+        <div className="mx-4 mt-4 bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
+          <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0" />
+          <p className="text-red-600 text-sm">{error}</p>
+        </div>
       )}
     </div>
   );

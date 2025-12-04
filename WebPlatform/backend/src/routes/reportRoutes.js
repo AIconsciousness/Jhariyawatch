@@ -64,9 +64,32 @@ const simulateAIAnalysis = () => {
 
 router.post('/', authMiddleware, upload.array('photos', 5), async (req, res) => {
   try {
-    const { reportType, description, latitude, longitude, urgencyLevel, address, locality } = req.body;
+    const { reportType, description, latitude, longitude, urgencyLevel, address, locality, imageUrl, imagePublicId, imageMetadata } = req.body;
 
-    if (!req.files || req.files.length === 0) {
+    // Support both Cloudinary URL and file upload
+    let photos = [];
+    
+    if (imageUrl) {
+      // Cloudinary URL provided (from frontend)
+      photos = [{
+        url: imageUrl,
+        publicId: imagePublicId || null,
+        uploadedAt: new Date(),
+        fileSize: imageMetadata?.bytes || 0,
+        width: imageMetadata?.width || null,
+        height: imageMetadata?.height || null,
+        format: imageMetadata?.format || null,
+        source: 'cloudinary'
+      }];
+    } else if (req.files && req.files.length > 0) {
+      // File upload (fallback)
+      photos = req.files.map(file => ({
+        url: `/uploads/${file.filename}`,
+        uploadedAt: new Date(),
+        fileSize: file.size,
+        source: 'local'
+      }));
+    } else {
       return res.status(400).json({
         success: false,
         error: { code: 'NO_PHOTOS', message: { en: 'At least one photo is required', hi: 'कम से कम एक फोटो आवश्यक है' } }
@@ -88,12 +111,6 @@ router.post('/', authMiddleware, upload.array('photos', 5), async (req, res) => 
     if (nearestZone) {
       nearestZoneId = nearestZone.zoneId;
     }
-
-    const photos = req.files.map(file => ({
-      url: `/uploads/${file.filename}`,
-      uploadedAt: new Date(),
-      fileSize: file.size
-    }));
 
     const aiAnalysis = simulateAIAnalysis();
 

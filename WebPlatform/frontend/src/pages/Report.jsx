@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../context/LanguageContext';
 import { Camera, Upload, MapPin, AlertCircle, CheckCircle, X, Loader } from 'lucide-react';
 import { reportAPI } from '../services/api';
+import { uploadImageUnsigned } from '../services/cloudinary';
 
 const Report = () => {
   const { t } = useTranslation();
@@ -65,23 +66,44 @@ const Report = () => {
     setError(null);
 
     try {
-      const formData = new FormData();
-      formData.append('photos', photo);
-      formData.append('reportType', reportType);
-      formData.append('description', description);
-      formData.append('urgencyLevel', urgency);
-      formData.append('latitude', location?.lat || 23.767);
-      formData.append('longitude', location?.lng || 86.396);
+      // Step 1: Upload image to Cloudinary
+      console.log('📤 Uploading image to Cloudinary...');
+      const uploadResult = await uploadImageUnsigned(photo, {
+        folder: 'jharia-reports'
+      });
 
-      const response = await reportAPI.submit(formData);
+      if (!uploadResult.success) {
+        throw new Error(uploadResult.error || 'Image upload failed');
+      }
+
+      console.log('✅ Image uploaded:', uploadResult.url);
+
+      // Step 2: Send report data with Cloudinary URL to backend
+      const reportData = {
+        reportType,
+        description,
+        urgencyLevel: urgency,
+        latitude: location?.lat || 23.767,
+        longitude: location?.lng || 86.396,
+        imageUrl: uploadResult.url, // Cloudinary URL
+        imagePublicId: uploadResult.publicId, // For future deletion if needed
+        imageMetadata: {
+          width: uploadResult.width,
+          height: uploadResult.height,
+          format: uploadResult.format,
+          bytes: uploadResult.bytes
+        }
+      };
+
+      const response = await reportAPI.submit(reportData);
       
       if (response.data.success) {
         setSubmitted(true);
         setAiResult(response.data.data.aiAnalysis);
       }
     } catch (err) {
-      console.error('Submit error:', err);
-      setError(err.response?.data?.error?.message?.[language] || 'Failed to submit report');
+      console.error('❌ Submit error:', err);
+      setError(err.response?.data?.error?.message?.[language] || err.message || 'Failed to submit report');
     } finally {
       setLoading(false);
     }

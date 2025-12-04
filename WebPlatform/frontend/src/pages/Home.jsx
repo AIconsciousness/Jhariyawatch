@@ -70,10 +70,10 @@ const Home = () => {
   }, []);
 
   const quickActions = [
-    { icon: MapPin, label: t('home.checkRisk'), path: '/risk-check', color: 'bg-red-500' },
-    { icon: Camera, label: t('home.submitReport'), path: '/report', color: 'bg-blue-500' },
-    { icon: Bell, label: t('home.viewAlerts'), path: '/alerts', color: 'bg-yellow-500', badge: alerts.length },
-    { icon: Shield, label: t('home.safetyTips'), path: '/safety', color: 'bg-green-500' }
+    { icon: MapPin, label: t('home.checkRisk'), path: '/dashboard/risk-check', color: 'bg-red-500' },
+    { icon: Camera, label: t('home.submitReport'), path: '/dashboard/report', color: 'bg-blue-500' },
+    { icon: Bell, label: t('home.viewAlerts'), path: '/dashboard/alerts', color: 'bg-yellow-500', badge: alerts.length },
+    { icon: Shield, label: t('home.safetyTips'), path: '/dashboard/safety', color: 'bg-green-500' }
   ];
 
   const getSeverityColor = (severity) => {
@@ -126,11 +126,43 @@ const Home = () => {
       </div>
 
       <div className="px-4 -mt-4">
-        <RiskMap 
-          userLocation={userLocation} 
-          height="200px"
-          onZoneClick={(zone) => navigate('/risk-check', { state: { zone } })}
-        />
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="p-3 bg-gradient-to-r from-red-50 to-orange-50 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-gray-800 text-sm">
+                {language === 'hi' ? 'झरिया जोखिम मानचित्र' : 'Jharia Risk Map'}
+              </h3>
+              <span className="text-xs text-gray-600">
+                {language === 'hi' ? 'PS-InSAR डेटा' : 'PS-InSAR Data'}
+              </span>
+            </div>
+          </div>
+          <RiskMap 
+            userLocation={userLocation} 
+            height="250px"
+            onZoneClick={(zone) => navigate('/dashboard/risk-check', { state: { zone } })}
+          />
+          {stats && (
+            <div className="p-3 bg-gray-50 border-t border-gray-200">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-gray-600">
+                  {language === 'hi' ? 'कुल जोन:' : 'Total Zones:'} <strong className="text-gray-800">{stats.totalZones || 0}</strong>
+                </span>
+                <div className="flex gap-2">
+                  <span className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">
+                    🔴 {stats.byRiskLevel?.critical || 0}
+                  </span>
+                  <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs font-medium">
+                    🟠 {stats.byRiskLevel?.high || 0}
+                  </span>
+                  <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-medium">
+                    🟡 {stats.byRiskLevel?.moderate || 0}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="px-4 mt-6">
@@ -218,7 +250,7 @@ const Home = () => {
       )}
 
       <button
-        onClick={() => navigate('/emergency')}
+        onClick={() => navigate('/dashboard/emergency')}
         className="fixed bottom-20 right-4 bg-red-500 text-white p-4 rounded-full shadow-lg hover:bg-red-600 transition z-40"
       >
         <Phone className="w-6 h-6" />

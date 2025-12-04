@@ -26,6 +26,13 @@ self.addEventListener('install', (event) => {
 
 // Fetch resources
 self.addEventListener('fetch', (event) => {
+  // Skip chrome-extension and other unsupported schemes
+  if (event.request.url.startsWith('chrome-extension://') || 
+      event.request.url.startsWith('moz-extension://') ||
+      event.request.url.startsWith('edge://')) {
+    return;
+  }
+
   // Skip caching for POST, PUT, DELETE requests (only cache GET requests)
   if (event.request.method !== 'GET') {
     event.respondWith(fetch(event.request));
@@ -34,6 +41,12 @@ self.addEventListener('fetch', (event) => {
 
   // Skip caching for API requests
   if (event.request.url.includes('/api/')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // Skip caching for non-http/https URLs
+  if (!event.request.url.startsWith('http')) {
     event.respondWith(fetch(event.request));
     return;
   }
@@ -52,17 +65,29 @@ self.addEventListener('fetch', (event) => {
               return response;
             }
 
+            // Only cache http/https requests
+            if (!event.request.url.startsWith('http')) {
+              return response;
+            }
+
             // Clone the response
             const responseToCache = response.clone();
 
             caches.open(CACHE_NAME)
               .then((cache) => {
-                cache.put(event.request, responseToCache);
+                try {
+                  cache.put(event.request, responseToCache);
+                } catch (error) {
+                  console.warn('Cache put failed:', error);
+                }
               });
 
             return response;
           }
-        );
+        ).catch((error) => {
+          console.warn('Fetch failed:', error);
+          return response;
+        });
       })
   );
 });

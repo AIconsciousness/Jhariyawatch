@@ -73,7 +73,17 @@ router.post('/register', [
       }
     });
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('❌ Registration error:', error);
+    console.error('Error stack:', error.stack);
+    
+    // Handle specific MongoDB errors
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'DUPLICATE_EMAIL', message: { en: 'Email already registered', hi: 'ईमेल पहले से पंजीकृत है' } }
+      });
+    }
+    
     res.status(500).json({
       success: false,
       error: { code: 'SERVER_ERROR', message: { en: 'Registration failed', hi: 'पंजीकरण विफल' } }
@@ -125,7 +135,8 @@ router.post('/login', [
       }
     });
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('❌ Login error:', error);
+    console.error('Error stack:', error.stack);
     res.status(500).json({
       success: false,
       error: { code: 'SERVER_ERROR', message: { en: 'Login failed', hi: 'लॉगिन विफल' } }
@@ -152,6 +163,61 @@ router.get('/profile', authMiddleware, async (req, res) => {
     res.status(500).json({
       success: false,
       error: { code: 'SERVER_ERROR', message: { en: 'Failed to get profile', hi: 'प्रोफ़ाइल प्राप्त करने में विफल' } }
+    });
+  }
+});
+
+router.post('/google', async (req, res) => {
+  try {
+    const { token, user: firebaseUser } = req.body;
+
+    if (!token || !firebaseUser) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'MISSING_DATA', message: { en: 'Firebase token and user data required', hi: 'Firebase टोकन और उपयोगकर्ता डेटा आवश्यक है' } }
+      });
+    }
+
+    // Verify Firebase token (in production, verify with Firebase Admin SDK)
+    // For now, we'll trust the token and create/login user
+
+    let user = await User.findOne({ email: firebaseUser.email });
+    
+    if (!user) {
+      // Create new user from Google sign in
+      user = new User({
+        email: firebaseUser.email,
+        name: firebaseUser.name || firebaseUser.displayName || 'User',
+        phone: firebaseUser.phoneNumber || '',
+        preferredLanguage: 'hi',
+        password: Math.random().toString(36).slice(-12), // Random password for Google users
+        addressDetails: {
+          area: 'Other',
+          street: ''
+        },
+        isActive: true
+      });
+      await user.save();
+    }
+
+    // Update last active
+    user.lastActive = new Date();
+    await user.save();
+
+    const jwtToken = generateToken(user._id);
+
+    res.json({
+      success: true,
+      data: {
+        token: jwtToken,
+        user: user.toJSON()
+      }
+    });
+  } catch (error) {
+    console.error('Google auth error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: { en: 'Google authentication failed', hi: 'Google प्रमाणीकरण विफल' } }
     });
   }
 });

@@ -26,9 +26,24 @@ const Login = () => {
     const result = await login(email, password);
     
     if (result.success) {
-      navigate('/');
+      navigate('/dashboard');
     } else {
-      setError(result.error?.message?.[language] || result.error?.message?.en || 'Login failed');
+      // Handle error message extraction properly
+      let errorMessage = 'Login failed';
+      if (result.error) {
+        if (typeof result.error === 'string') {
+          errorMessage = result.error;
+        } else if (result.error.message) {
+          if (typeof result.error.message === 'string') {
+            errorMessage = result.error.message;
+          } else if (typeof result.error.message === 'object') {
+            errorMessage = result.error.message[language] || result.error.message.en || result.error.message.hi || 'Login failed';
+          }
+        } else if (result.error.en || result.error.hi) {
+          errorMessage = result.error[language] || result.error.en || result.error.hi;
+        }
+      }
+      setError(errorMessage);
     }
     
     setLoading(false);

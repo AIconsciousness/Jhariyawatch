@@ -27,6 +27,28 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Log all errors for debugging
+    if (error.response) {
+      // Server responded with error status
+      console.error('API Error Response:', {
+        status: error.response.status,
+        data: error.response.data,
+        url: error.config?.url,
+        method: error.config?.method
+      });
+    } else if (error.request) {
+      // Request made but no response received (network error, CORS, etc.)
+      console.error('API Network Error:', {
+        message: error.message,
+        url: error.config?.url,
+        method: error.config?.method,
+        hint: 'Backend server might not be running or CORS issue'
+      });
+    } else {
+      // Something else happened
+      console.error('API Error:', error.message);
+    }
+    
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -51,8 +73,8 @@ export const riskAPI = {
 };
 
 export const reportAPI = {
-  submit: (formData) => api.post('/reports', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
+  submit: (data) => api.post('/reports', data, {
+    headers: { 'Content-Type': 'application/json' }
   }),
   getMyReports: (params) => api.get('/reports', { params }),
   getAllReports: (params) => api.get('/reports/all', { params }),
