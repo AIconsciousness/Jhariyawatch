@@ -43,8 +43,8 @@ const Landing = () => {
   ];
 
   const stats = [
-    { value: '450+', label: language === 'hi' ? 'निगरानी क्षेत्र' : 'Monitored Areas' },
-    { value: '10,000+', label: language === 'hi' ? 'सक्रिय उपयोगकर्ता' : 'Active Users' },
+    { value: '45+', label: language === 'hi' ? 'निगरानी क्षेत्र' : 'Monitored Areas' },
+    { value: '1000+', label: language === 'hi' ? 'सक्रिय उपयोगकर्ता' : 'Active Users' },
     { value: '24/7', label: language === 'hi' ? 'निगरानी' : 'Monitoring' },
     { value: '95%', label: language === 'hi' ? 'सटीकता' : 'Accuracy' }
   ];
@@ -383,7 +383,7 @@ const Landing = () => {
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-2xl flex items-end">
               <div className="p-8 text-white">
                 <h3 className="text-2xl font-bold mb-2">
-                  {language === 'hi' ? '10,000+ परिवार सुरक्षित' : '10,000+ Families Protected'}
+                  {language === 'hi' ? '1000+ परिवार सुरक्षित' : '1000+ Families Protected'}
                 </h3>
                 <p className="text-gray-200">
                   {language === 'hi'
@@ -420,7 +420,7 @@ const Landing = () => {
               className="bg-white/10 backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white/20 transition inline-flex items-center justify-center gap-2"
             >
               <Phone className="w-5 h-5" />
-              {language === 'hi' ? 'हेल्पलाइन: 1800-xxx-xxxx' : 'Helpline: 1800-xxx-xxxx'}
+              {language === 'hi' ? 'हेल्पलाइन: 2230133-137' : 'Helpline: 2230112'}
             </a>
           </div>
         </div>
@@ -472,7 +472,7 @@ const Landing = () => {
               <div className="space-y-2 text-sm md:text-base text-gray-400">
                 <p className="flex items-center gap-2">
                   <Phone className="w-4 h-4" />
-                  <span>1800-xxx-xxxx</span>
+                  <span>2230133</span>
                 </p>
                 <p className="text-sm">
                   {language === 'hi' ? '24/7 उपलब्ध' : '24/7 Available'}
