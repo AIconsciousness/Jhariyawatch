@@ -1,0 +1,146 @@
+{
+  "app": {
+    "name": "झरियावॉच",
+    "tagline": "धंसाव निगरानी और अलर्ट सिस्टम"
+  },
+  "nav": {
+    "home": "होम",
+    "riskCheck": "जोखिम जांच",
+    "report": "रिपोर्ट",
+    "alerts": "अलर्ट",
+    "safety": "सुरक्षा",
+    "emergency": "आपातकाल",
+    "profile": "प्रोफ़ाइल"
+  },
+  "auth": {
+    "login": "लॉगिन",
+    "register": "पंजीकरण",
+    "email": "ईमेल",
+    "password": "पासवर्ड",
+    "name": "पूरा नाम",
+    "phone": "फोन नंबर",
+    "confirmPassword": "पासवर्ड की पुष्टि करें",
+    "loginTitle": "वापस स्वागत है",
+    "registerTitle": "खाता बनाएं",
+    "noAccount": "खाता नहीं है?",
+    "haveAccount": "पहले से खाता है?",
+    "logout": "लॉगआउट"
+  },
+  "home": {
+    "title": "झरिया धंसाव मॉनिटर",
+    "subtitle": "आपकी सुरक्षा के लिए रियल-टाइम जोखिम निगरानी",
+    "currentLocation": "आपका स्थान",
+    "riskStatus": "जोखिम स्थिति",
+    "viewMap": "पूरा नक्शा देखें",
+    "quickActions": "त्वरित कार्य",
+    "checkRisk": "जोखिम जांचें",
+    "submitReport": "रिपोर्ट करें",
+    "viewAlerts": "अलर्ट देखें",
+    "safetyTips": "सुरक्षा टिप्स",
+    "psinsar": "PSInSAR विश्लेषण",
+    "subsidenceRate": "धंसाव दर",
+    "perYear": "/वर्ष"
+  },
+  "risk": {
+    "title": "जोखिम मूल्यांकन",
+    "checking": "जोखिम स्तर जांचा जा रहा है...",
+    "yourLocation": "आपका स्थान",
+    "riskLevel": "जोखिम स्तर",
+    "critical": "गंभीर",
+    "high": "उच्च",
+    "moderate": "मध्यम",
+    "low": "कम",
+    "stable": "स्थिर",
+    "uplifting": "उत्थान",
+    "subsidenceRate": "धंसाव दर",
+    "perYear": "प्रति वर्ष",
+    "recommendations": "सुरक्षा सिफारिशें",
+    "nearestSafe": "निकटतम सुरक्षित क्षेत्र",
+    "inRiskZone": "आप जोखिम क्षेत्र में हैं",
+    "notInRiskZone": "आप सुरक्षित क्षेत्र में हैं",
+    "coherence": "कोहेरेंस",
+    "displacement": "संचयी विस्थापन"
+  },
+  "report": {
+    "title": "रिपोर्ट जमा करें",
+    "takePhoto": "फोटो लें",
+    "selectFromGallery": "फोटो चुनें",
+    "reportType": "रिपोर्ट प्रकार",
+    "types": {
+      "crack": "जमीन में दरार",
+      "subsidence": "भूमि धंसाव",
+      "building_damage": "भवन क्षति",
+      "road_damage": "सड़क क्षति",
+      "other": "अन्य"
+    },
+    "description": "विवरण (वैकल्पिक)",
+    "descriptionPlaceholder": "आपने जो देखा उसका वर्णन करें...",
+    "urgency": "तात्कालिकता स्तर",
+    "urgencyLevels": {
+      "low": "कम",
+      "medium": "मध्यम",
+      "high": "उच्च",
+      "emergency": "आपातकालीन"
+    },
+    "submit": "रिपोर्ट जमा करें",
+    "submitting": "जमा हो रहा है...",
+    "success": "रिपोर्ट सफलतापूर्वक जमा हो गई!",
+    "aiAnalyzing": "AI आपकी फोटो का विश्लेषण कर रहा है...",
+    "crackDetected": "दरार पाई गई",
+    "severity": "गंभीरता",
+    "confidence": "विश्वास स्तर"
+  },
+  "alerts": {
+    "title": "सक्रिय अलर्ट",
+    "noAlerts": "कोई सक्रिय अलर्ट नहीं",
+    "emergency": "आपातकालीन",
+    "warning": "चेतावनी",
+    "info": "सूचना",
+    "update": "अपडेट",
+    "validUntil": "वैध तक",
+    "instructions": "निर्देश",
+    "affectedAreas": "प्रभावित क्षेत्र"
+  },
+  "safety": {
+    "title": "सुरक्षा जानकारी",
+    "tips": "सुरक्षा टिप्स",
+    "dosDonts": "क्या करें और क्या न करें",
+    "emergency": "आपातकालीन संपर्क",
+    "evacuation": "निकासी गाइड",
+    "beforeSubsidence": "धंसाव से पहले",
+    "duringSubsidence": "धंसाव के दौरान",
+    "afterSubsidence": "धंसाव के बाद"
+  },
+  "emergency": {
+    "title": "आपातकालीन संपर्क",
+    "bccl": "BCCL नियंत्रण कक्ष",
+    "dc": "धनबाद DC कार्यालय",
+    "ndma": "NDMA हेल्पलाइन",
+    "fire": "अग्निशमन सेवा",
+    "ambulance": "एम्बुलेंस",
+    "police": "पुलिस",
+    "call": "कॉल करें"
+  },
+  "profile": {
+    "title": "मेरी प्रोफ़ाइल",
+    "editProfile": "प्रोफ़ाइल संपादित करें",
+    "language": "भाषा",
+    "notifications": "सूचनाएं",
+    "myReports": "मेरी रिपोर्ट",
+    "settings": "सेटिंग्स"
+  },
+  "common": {
+    "loading": "लोड हो रहा है...",
+    "error": "कुछ गलत हो गया",
+    "retry": "पुनः प्रयास करें",
+    "cancel": "रद्द करें",
+    "confirm": "पुष्टि करें",
+    "save": "सहेजें",
+    "close": "बंद करें",
+    "km": "किमी",
+    "mm": "मिमी",
+    "back": "वापस",
+    "next": "आगे",
+    "submit": "जमा करें"
+  }
+}

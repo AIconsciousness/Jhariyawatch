@@ -1,0 +1,146 @@
+{
+  "app": {
+    "name": "JhariaWatch",
+    "tagline": "Subsidence Monitoring & Alert System"
+  },
+  "nav": {
+    "home": "Home",
+    "riskCheck": "Risk Check",
+    "report": "Report",
+    "alerts": "Alerts",
+    "safety": "Safety",
+    "emergency": "Emergency",
+    "profile": "Profile"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "name": "Full Name",
+    "phone": "Phone Number",
+    "confirmPassword": "Confirm Password",
+    "loginTitle": "Welcome Back",
+    "registerTitle": "Create Account",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "logout": "Logout"
+  },
+  "home": {
+    "title": "Jharia Subsidence Monitor",
+    "subtitle": "Real-time risk monitoring for your safety",
+    "currentLocation": "Your Location",
+    "riskStatus": "Risk Status",
+    "viewMap": "View Full Map",
+    "quickActions": "Quick Actions",
+    "checkRisk": "Check Risk",
+    "submitReport": "Submit Report",
+    "viewAlerts": "View Alerts",
+    "safetyTips": "Safety Tips",
+    "psinsar": "PSInSAR Analysis",
+    "subsidenceRate": "Subsidence Rate",
+    "perYear": "/year"
+  },
+  "risk": {
+    "title": "Risk Assessment",
+    "checking": "Checking risk level...",
+    "yourLocation": "Your Location",
+    "riskLevel": "Risk Level",
+    "critical": "CRITICAL",
+    "high": "HIGH",
+    "moderate": "MODERATE",
+    "low": "LOW",
+    "stable": "STABLE",
+    "uplifting": "UPLIFTING",
+    "subsidenceRate": "Subsidence Rate",
+    "perYear": "per year",
+    "recommendations": "Safety Recommendations",
+    "nearestSafe": "Nearest Safe Zone",
+    "inRiskZone": "You are in a risk zone",
+    "notInRiskZone": "You are in a safe area",
+    "coherence": "Coherence",
+    "displacement": "Cumulative Displacement"
+  },
+  "report": {
+    "title": "Submit Report",
+    "takePhoto": "Take Photo",
+    "selectFromGallery": "Select Photo",
+    "reportType": "Report Type",
+    "types": {
+      "crack": "Ground Crack",
+      "subsidence": "Land Subsidence",
+      "building_damage": "Building Damage",
+      "road_damage": "Road Damage",
+      "other": "Other"
+    },
+    "description": "Description (Optional)",
+    "descriptionPlaceholder": "Describe what you observed...",
+    "urgency": "Urgency Level",
+    "urgencyLevels": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "emergency": "Emergency"
+    },
+    "submit": "Submit Report",
+    "submitting": "Submitting...",
+    "success": "Report submitted successfully!",
+    "aiAnalyzing": "AI analyzing your photo...",
+    "crackDetected": "Crack Detected",
+    "severity": "Severity",
+    "confidence": "Confidence"
+  },
+  "alerts": {
+    "title": "Active Alerts",
+    "noAlerts": "No active alerts",
+    "emergency": "EMERGENCY",
+    "warning": "WARNING",
+    "info": "INFO",
+    "update": "UPDATE",
+    "validUntil": "Valid until",
+    "instructions": "Instructions",
+    "affectedAreas": "Affected Areas"
+  },
+  "safety": {
+    "title": "Safety Information",
+    "tips": "Safety Tips",
+    "dosDonts": "Do's and Don'ts",
+    "emergency": "Emergency Contacts",
+    "evacuation": "Evacuation Guide",
+    "beforeSubsidence": "Before Subsidence",
+    "duringSubsidence": "During Subsidence",
+    "afterSubsidence": "After Subsidence"
+  },
+  "emergency": {
+    "title": "Emergency Contacts",
+    "bccl": "BCCL Control Room",
+    "dc": "Dhanbad DC Office",
+    "ndma": "NDMA Helpline",
+    "fire": "Fire Services",
+    "ambulance": "Ambulance",
+    "police": "Police",
+    "call": "Call"
+  },
+  "profile": {
+    "title": "My Profile",
+    "editProfile": "Edit Profile",
+    "language": "Language",
+    "notifications": "Notifications",
+    "myReports": "My Reports",
+    "settings": "Settings"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "close": "Close",
+    "km": "km",
+    "mm": "mm",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit"
+  }
+}

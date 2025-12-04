@@ -1,0 +1,119 @@
+require('dotenv').config();
+
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+const path = require('path');
+
+const authRoutes = require('./routes/authRoutes');
+const riskRoutes = require('./routes/riskRoutes');
+const reportRoutes = require('./routes/reportRoutes');
+const alertRoutes = require('./routes/alertRoutes');
+const seedRoutes = require('./routes/seedRoutes');
+
+const app = express();
+const PORT = process.env.PORT || 3001;
+
+app.set('trust proxy', 1);
+
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: false
+}));
+app.use(cors());
+app.use(morgan('dev'));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 200,
+  message: {
+    success: false,
+    error: { code: 'RATE_LIMITED', message: { en: 'Too many requests', hi: 'बहुत सारे अनुरोध' } }
+  }
+});
+app.use(limiter);
+
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
+});
+
+app.use('/api/auth', authRoutes);
+app.use('/api/risk', riskRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/alerts', alertRoutes);
+app.use('/api/admin', seedRoutes);
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: { code: 'NOT_FOUND', message: { en: 'Route not found', hi: 'रूट नहीं मिला' } }
+  });
+});
+
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(err.status || 500).json({
+    success: false,
+    error: {
+      code: err.code || 'SERVER_ERROR',
+      message: { en: err.message || 'Internal server error', hi: 'आंतरिक सर्वर त्रुटि' }
+    }
+  });
+});
+
+const { seedDatabase } = require('./data/seedData');
+
+const connectDB = async () => {
+  try {
+    const mongoUri = process.env.MONGODB_URI;
+    if (!mongoUri) {
+      console.error('MONGODB_URI not found in environment variables');
+      process.exit(1);
+    }
+    await mongoose.connect(mongoUri);
+    console.log('MongoDB connected successfully');
+  } catch (error) {
+    console.error('MongoDB connection error:', error.message);
+    process.exit(1);
+  }
+};
+
+const initializeDatabase = async () => {
+  try {
+    const RiskZone = require('./models/RiskZone');
+    const count = await RiskZone.countDocuments();
+    if (count === 0) {
+      console.log('No data found, seeding database...');
+      await seedDatabase();
+    } else {
+      console.log(`Database has ${count} risk zones, skipping seed`);
+    }
+  } catch (error) {
+    console.error('Database initialization error:', error.message);
+  }
+};
+
+const startServer = async () => {
+  await connectDB();
+  await initializeDatabase();
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+};
+
+startServer();
+
+module.exports = app;

@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #1a1a2e;
+  --color-primary-dark: #16213e;
+  --color-primary-light: #0f3460;
+  --color-critical: #dc2626;
+  --color-high: #ea580c;
+  --color-moderate: #ca8a04;
+  --color-low: #65a30d;
+  --color-stable: #16a34a;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-gray-100;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+}
+
+.risk-critical { background-color: rgba(220, 38, 38, 0.3); border-color: #dc2626; }
+.risk-high { background-color: rgba(234, 88, 12, 0.3); border-color: #ea580c; }
+.risk-moderate { background-color: rgba(202, 138, 4, 0.3); border-color: #ca8a04; }
+.risk-low { background-color: rgba(101, 163, 13, 0.3); border-color: #65a30d; }
+.risk-stable { background-color: rgba(22, 163, 74, 0.3); border-color: #16a34a; }
+
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+@layer utilities {
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+input, button, textarea, select {
+  font-family: inherit;
+}
+
+.gradient-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+}
