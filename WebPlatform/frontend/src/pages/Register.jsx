@@ -84,13 +84,23 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen relative flex flex-col">
-      {/* Background Image */}
+    <div className="min-h-screen relative flex flex-col overflow-hidden">
+      {/* Background Image with Parallax Effect */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: 'url(/images/mining.jpg)' }}
+        className="absolute inset-0 bg-cover bg-center transform scale-110 animate-subtle-zoom"
+        style={{
+          backgroundImage: 'url(/images/mining.jpg)',
+          filter: 'brightness(0.7) contrast(1.1) saturate(1.2)'
+        }}
       />
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-900/90 via-red-900/85 to-orange-800/90" />
+      {/* Animated Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-900/95 via-red-900/90 to-orange-800/95 animate-gradient-shift" />
+
+      {/* Floating Particles Effect */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute w-96 h-96 bg-orange-500/10 rounded-full blur-3xl -top-48 -right-48 animate-float-slow"></div>
+        <div className="absolute w-96 h-96 bg-red-500/10 rounded-full blur-3xl -bottom-48 -left-48 animate-float-slower"></div>
+      </div>
 
       {/* Content */}
       <div className="relative z-10">

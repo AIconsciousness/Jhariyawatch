@@ -35,13 +35,23 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen relative flex flex-col">
-      {/* Background Image */}
+    <div className="min-h-screen relative flex flex-col overflow-hidden">
+      {/* Background Image with Parallax Effect */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: 'url(/images/coalfield.jpg)' }}
+        className="absolute inset-0 bg-cover bg-center transform scale-110 animate-subtle-zoom"
+        style={{
+          backgroundImage: 'url(/images/coalfield.jpg)',
+          filter: 'brightness(0.7) contrast(1.1)'
+        }}
       />
-      <div className="absolute inset-0 bg-gradient-to-br from-red-900/90 via-orange-900/85 to-red-800/90" />
+      {/* Animated Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-red-900/95 via-orange-900/90 to-red-800/95 animate-gradient-shift" />
+
+      {/* Floating Particles Effect */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute w-96 h-96 bg-orange-500/10 rounded-full blur-3xl -top-48 -left-48 animate-float-slow"></div>
+        <div className="absolute w-96 h-96 bg-red-500/10 rounded-full blur-3xl -bottom-48 -right-48 animate-float-slower"></div>
+      </div>
 
       {/* Content */}
       <div className="relative z-10">
