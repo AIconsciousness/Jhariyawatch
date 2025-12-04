@@ -12,6 +12,9 @@ import Alerts from './pages/Alerts';
 import Safety from './pages/Safety';
 import Emergency from './pages/Emergency';
 import Profile from './pages/Profile';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import CookiePolicy from './pages/CookiePolicy';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -42,6 +45,9 @@ function App() {
       <Route path="/" element={user && !loading ? <Navigate to="/dashboard" replace /> : <Landing />} />
       <Route path="/login" element={user && !loading ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/register" element={user && !loading ? <Navigate to="/dashboard" replace /> : <Register />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms-of-service" element={<TermsOfService />} />
+      <Route path="/cookie-policy" element={<CookiePolicy />} />
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <Layout />

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../context/LanguageContext';
 import { MapPin, Satellite, AlertTriangle, Shield, TrendingDown, Users, Phone, Menu, X, ChevronRight } from 'lucide-react';
 import LanguageToggle from '../components/LanguageToggle';
+import PWAInstallPrompt from '../components/PWAInstallPrompt';
 
 const Landing = () => {
   const { t } = useTranslation();
@@ -55,9 +56,7 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-orange-600 rounded-lg flex items-center justify-center">
-                <MapPin className="w-6 h-6 text-white" />
-              </div>
+              <img src="/logo.png" alt="JhariaWatch" className="w-10 h-10 rounded-lg" />
               <span className="text-xl font-bold text-gray-900">JhariaWatch</span>
             </div>
 
@@ -430,12 +429,10 @@ const Landing = () => {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+          <div className="grid md:grid-cols-5 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-orange-600 rounded-lg flex items-center justify-center">
-                  <MapPin className="w-6 h-6 text-white" />
-                </div>
+                <img src="/logo.png" alt="JhariaWatch" className="w-10 h-10 rounded-lg" />
                 <span className="text-xl font-bold">JhariaWatch</span>
               </div>
               <p className="text-gray-400">
@@ -463,6 +460,14 @@ const Landing = () => {
               </ul>
             </div>
             <div>
+              <h4 className="font-bold mb-4">{language === 'hi' ? 'कानूनी' : 'Legal'}</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><Link to="/privacy-policy" className="hover:text-white transition">{language === 'hi' ? 'गोपनीयता नीति' : 'Privacy Policy'}</Link></li>
+                <li><Link to="/terms-of-service" className="hover:text-white transition">{language === 'hi' ? 'सेवा की शर्तें' : 'Terms of Service'}</Link></li>
+                <li><Link to="/cookie-policy" className="hover:text-white transition">{language === 'hi' ? 'कुकी नीति' : 'Cookie Policy'}</Link></li>
+              </ul>
+            </div>
+            <div>
               <h4 className="font-bold mb-4">{language === 'hi' ? 'आपातकालीन' : 'Emergency'}</h4>
               <div className="space-y-2 text-gray-400">
                 <p className="flex items-center gap-2">
@@ -480,6 +485,9 @@ const Landing = () => {
           </div>
         </div>
       </footer>
+
+      {/* PWA Install Prompt */}
+      <PWAInstallPrompt />
     </div>
   );
 };
