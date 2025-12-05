@@ -69,7 +69,7 @@ const DetailedSubsidenceChart = ({ place, height = 400 }) => {
   }
 
   const riskColor = getRiskColor(place.riskLevel);
-  const threshold = 7; // mm/year danger threshold
+  const thresholds = { high: 3, critical: 7 }; // mm/year thresholds
   const riskDistribution = ['critical', 'high', 'moderate', 'low', 'stable'].map(level => ({
     name: level,
     value: chartData.filter(d => d.riskLevel === level).length,
@@ -83,6 +83,7 @@ const DetailedSubsidenceChart = ({ place, height = 400 }) => {
     { value: 'rate', label: language === 'hi' ? 'दर' : 'Rate', icon: Activity },
     { value: 'cumulative', label: language === 'hi' ? 'संचयी' : 'Cumulative', icon: BarChart3 },
     { value: 'both', label: language === 'hi' ? 'दोनों' : 'Both', icon: TrendingDown },
+    { value: 'bar', label: language === 'hi' ? 'बार चार्ट' : 'Bar' , icon: BarChart3 },
     { value: 'distribution', label: language === 'hi' ? 'जोखिम वितरण' : 'Risk Distribution', icon: PieIcon }
   ];
 
