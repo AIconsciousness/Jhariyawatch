@@ -4,7 +4,7 @@
 const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || "dhrzekva0";
 const CLOUDINARY_API_KEY = import.meta.env.VITE_CLOUDINARY_API_KEY || "668573826234893";
 const CLOUDINARY_API_SECRET = import.meta.env.VITE_CLOUDINARY_API_SECRET || "uBSa7-0cCoOXoIWF7-DLpGE0ZmQ";
-const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || "jharia_reports"; // Will use unsigned upload
+const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || "jharia_reports"; // unsigned preset
 
 export const isCloudinaryConfigured = () => {
   return CLOUDINARY_CLOUD_NAME && CLOUDINARY_CLOUD_NAME !== "YOUR_CLOUD_NAME";
@@ -170,31 +170,17 @@ export const uploadImageUnsigned = async (file, options = {}) => {
   try {
     const formData = new FormData();
     formData.append('file', file);
-    
-    // Try unsigned preset first
-    if (CLOUDINARY_UPLOAD_PRESET && CLOUDINARY_UPLOAD_PRESET !== 'jharia_reports') {
-      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-    } else {
-      // If preset not set, use signed upload with API credentials
-      const timestamp = Math.round(new Date().getTime() / 1000);
-      const folder = options.folder || 'jharia-reports';
-      const publicId = `${folder}/${timestamp}_${file.name.replace(/\.[^/.]+$/, '')}`;
-      
-      // Create signature for signed upload
-      const params = `folder=${folder}&public_id=${publicId}&timestamp=${timestamp}${CLOUDINARY_API_SECRET}`;
-      const signature = await createSignature(params);
-      
-      formData.append('api_key', CLOUDINARY_API_KEY);
-      formData.append('timestamp', timestamp);
-      formData.append('signature', signature);
-      formData.append('folder', folder);
-      formData.append('public_id', publicId);
-    }
-    
+
     const folder = options.folder || 'jharia-reports';
-    if (!formData.has('folder')) {
-      formData.append('folder', folder);
-    }
+    formData.append('folder', folder);
+
+    // Always use unsigned preset (no signature required)
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+    // Optional: specify public_id for better organization
+    const timestamp = Math.round(new Date().getTime() / 1000);
+    const publicId = `${folder}/${timestamp}_${file.name.replace(/\.[^/.]+$/, '')}`;
+    formData.append('public_id', publicId);
 
     const response = await fetch(
       `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
@@ -230,14 +216,6 @@ export const uploadImageUnsigned = async (file, options = {}) => {
       error: error.message
     };
   }
-};
-
-// Simple SHA-1 hash for signature (in production, use crypto library)
-const createSignature = async (params) => {
-  // For now, using a simple approach
-  // In production, use proper crypto library like crypto-js
-  // For unsigned uploads, this won't be needed if preset is configured
-  return '';
 };
 
 /**

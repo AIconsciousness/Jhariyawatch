@@ -113,6 +113,17 @@ const RiskCheck = () => {
     return colors[level] || '#6b7280';
   };
 
+  // Precompute risk values (must happen before any early return)
+  const riskLevel = selectedPlace?.riskLevel 
+    || riskData?.riskAssessment?.zone?.riskLevel 
+    || riskData?.riskAssessment?.riskLevel 
+    || 'stable';
+  const riskColor = getRiskColor(riskLevel);
+  const zoneId = riskData?.riskAssessment?.zone?.zoneId || selectedPlace?.id;
+
+  // Enable notifications for dangerous subsidence (hooks must run unconditionally)
+  useSubsidenceNotifications(zoneId, chartData);
+
   if (loading && !selectedPlace) {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
@@ -121,13 +132,6 @@ const RiskCheck = () => {
       </div>
     );
   }
-
-  const riskLevel = selectedPlace?.riskLevel || riskData?.riskAssessment?.zone?.riskLevel || riskData?.riskAssessment?.riskLevel || 'stable';
-  const riskColor = getRiskColor(riskLevel);
-  const zoneId = riskData?.riskAssessment?.zone?.zoneId || selectedPlace?.id;
-
-  // Enable notifications for dangerous subsidence
-  useSubsidenceNotifications(zoneId, chartData);
 
   return (
     <div className="min-h-screen bg-gray-100 pb-24">

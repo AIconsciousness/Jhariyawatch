@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart, Bar } from 'recharts';
-import { TrendingDown, AlertTriangle, Calendar, BarChart3, Activity } from 'lucide-react';
+import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart, Bar, PieChart, Pie, Cell, BarChart, ReferenceLine } from 'recharts';
+import { TrendingDown, AlertTriangle, Calendar, BarChart3, Activity, PieChart as PieIcon } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { generatePlaceTimeSeries } from '../data/jhariaPlaces';
 
@@ -69,6 +69,22 @@ const DetailedSubsidenceChart = ({ place, height = 400 }) => {
   }
 
   const riskColor = getRiskColor(place.riskLevel);
+  const threshold = 7; // mm/year danger threshold
+  const riskDistribution = ['critical', 'high', 'moderate', 'low', 'stable'].map(level => ({
+    name: level,
+    value: chartData.filter(d => d.riskLevel === level).length,
+    label: {
+      hi: level === 'critical' ? 'खतरा' : level === 'high' ? 'उच्च' : level === 'moderate' ? 'मध्यम' : level === 'low' ? 'कम' : 'स्थिर',
+      en: level.charAt(0).toUpperCase() + level.slice(1)
+    }
+  })).filter(item => item.value > 0);
+
+  const chartCards = [
+    { value: 'rate', label: language === 'hi' ? 'दर' : 'Rate', icon: Activity },
+    { value: 'cumulative', label: language === 'hi' ? 'संचयी' : 'Cumulative', icon: BarChart3 },
+    { value: 'both', label: language === 'hi' ? 'दोनों' : 'Both', icon: TrendingDown },
+    { value: 'distribution', label: language === 'hi' ? 'जोखिम वितरण' : 'Risk Distribution', icon: PieIcon }
+  ];
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm">
@@ -101,12 +117,8 @@ const DetailedSubsidenceChart = ({ place, height = 400 }) => {
         </div>
 
         {/* Chart Type Selector */}
-        <div className="flex gap-2 mb-4">
-          {[
-            { value: 'rate', label: language === 'hi' ? 'दर' : 'Rate', icon: Activity },
-            { value: 'cumulative', label: language === 'hi' ? 'संचयी' : 'Cumulative', icon: BarChart3 },
-            { value: 'both', label: language === 'hi' ? 'दोनों' : 'Both', icon: TrendingDown }
-          ].map((type) => (
+        <div className="flex gap-2 mb-4 flex-wrap">
+          {chartCards.map((type) => (
             <button
               key={type.value}
               onClick={() => setChartType(type.value)}
