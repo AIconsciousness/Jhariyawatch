@@ -43,13 +43,24 @@ export const AuthProvider = ({ children }) => {
       console.log('✅ Login response:', JSON.stringify(response.data, null, 2));
       console.log('Response status:', response.status);
       console.log('Response headers:', response.headers);
+      console.log('Response data type:', typeof response.data);
+      console.log('Response data length:', response.data?.length || 'N/A');
       
-      // Check response structure
-      if (!response || !response.data) {
+      // Check response structure - handle empty string responses
+      if (!response || response.data === undefined || response.data === null) {
         console.error('❌ Invalid response structure:', response);
         return { 
           success: false, 
           error: { message: { en: 'Invalid server response', hi: 'अमान्य सर्वर प्रतिक्रिया' } } 
+        };
+      }
+      
+      // Handle empty string response (common with proxy issues)
+      if (response.data === '' || (typeof response.data === 'string' && response.data.trim() === '')) {
+        console.error('❌ Empty response body - possible proxy/CORS issue');
+        return { 
+          success: false, 
+          error: { message: { en: 'Server returned empty response. Please check backend configuration.', hi: 'सर्वर ने खाली प्रतिक्रिया दी। कृपया बैकएंड कॉन्फ़िगरेशन जांचें।' } } 
         };
       }
       
@@ -116,13 +127,24 @@ export const AuthProvider = ({ children }) => {
       console.log('✅ Register response:', JSON.stringify(response.data, null, 2));
       console.log('Response status:', response.status);
       console.log('Response headers:', response.headers);
+      console.log('Response data type:', typeof response.data);
+      console.log('Response data length:', response.data?.length || 'N/A');
       
-      // Check response structure
-      if (!response || !response.data) {
+      // Check response structure - handle empty string responses
+      if (!response || response.data === undefined || response.data === null) {
         console.error('❌ Invalid response structure:', response);
         return { 
           success: false, 
           error: { message: { en: 'Invalid server response', hi: 'अमान्य सर्वर प्रतिक्रिया' } } 
+        };
+      }
+      
+      // Handle empty string response (common with proxy issues)
+      if (response.data === '' || (typeof response.data === 'string' && response.data.trim() === '')) {
+        console.error('❌ Empty response body - possible proxy/CORS issue');
+        return { 
+          success: false, 
+          error: { message: { en: 'Server returned empty response. Please check backend configuration.', hi: 'सर्वर ने खाली प्रतिक्रिया दी। कृपया बैकएंड कॉन्फ़िगरेशन जांचें।' } } 
         };
       }
       

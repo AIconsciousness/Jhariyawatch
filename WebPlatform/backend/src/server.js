@@ -23,10 +23,53 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
   contentSecurityPolicy: false
 }));
-app.use(cors());
+
+// CORS configuration - more explicit for production
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow all origins in development, specific origins in production
+    const allowedOrigins = [
+      'http://localhost:5000',
+      'http://localhost:3000',
+      'https://jhariyawatch.onrender.com',
+      'https://jhariyawatch.vercel.app',
+      'https://*.vercel.app',
+      'https://*.netlify.app'
+    ];
+    
+    // Check if origin matches any allowed pattern
+    const isAllowed = allowedOrigins.some(allowed => {
+      if (allowed.includes('*')) {
+        const pattern = allowed.replace('*', '.*');
+        return new RegExp(pattern).test(origin);
+      }
+      return origin === allowed;
+    });
+    
+    if (isAllowed || process.env.NODE_ENV !== 'production') {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all for now, can restrict later
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(morgan('dev'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Ensure JSON responses have proper headers
+app.use((req, res, next) => {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  next();
+});
 
 const limiter = rateLimit({
   windowMs: 60 * 1000,

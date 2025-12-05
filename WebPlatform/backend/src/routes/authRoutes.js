@@ -20,8 +20,11 @@ router.post('/register', [
   body('addressDetails.street').trim().notEmpty()
 ], async (req, res) => {
   try {
+    console.log('📝 Register request received:', { email: req.body.email, name: req.body.name });
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Validation errors:', errors.array());
       return res.status(400).json({
         success: false,
         error: { code: 'VALIDATION_ERROR', message: { en: 'Invalid input data', hi: 'अमान्य इनपुट डेटा' }, details: errors.array() }
@@ -32,6 +35,7 @@ router.post('/register', [
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+      console.log('❌ User already exists:', email);
       return res.status(400).json({
         success: false,
         error: { code: 'USER_EXISTS', message: { en: 'Email already registered', hi: 'ईमेल पहले से पंजीकृत है' } }
@@ -59,19 +63,34 @@ router.post('/register', [
     }
 
     const user = new User(userData);
-
     await user.save();
+    
+    console.log('✅ User saved:', user._id);
 
     const token = generateToken(user._id);
+    const userJson = user.toJSON();
+    
+    console.log('✅ Registration successful for:', email);
+    console.log('Token generated:', token ? 'Yes' : 'No');
+    console.log('User data:', { id: userJson._id, email: userJson.email, name: userJson.name });
 
-    res.status(201).json({
+    // Ensure response is sent with proper headers
+    const responseData = {
       success: true,
       message: { en: 'User registered successfully', hi: 'उपयोगकर्ता सफलतापूर्वक पंजीकृत हो गया' },
       data: {
         token,
-        user: user.toJSON()
+        user: userJson
       }
-    });
+    };
+    
+    console.log('Sending response:', JSON.stringify(responseData, null, 2));
+    
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Length', Buffer.byteLength(JSON.stringify(responseData)));
+    res.status(201).json(responseData);
+    
+    console.log('✅ Response sent successfully');
   } catch (error) {
     console.error('❌ Registration error:', error);
     console.error('Error stack:', error.stack);
@@ -84,10 +103,12 @@ router.post('/register', [
       });
     }
     
-    res.status(500).json({
+    const errorResponse = {
       success: false,
       error: { code: 'SERVER_ERROR', message: { en: 'Registration failed', hi: 'पंजीकरण विफल' } }
-    });
+    };
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.status(500).json(errorResponse);
   }
 });
 
@@ -96,8 +117,11 @@ router.post('/login', [
   body('password').notEmpty()
 ], async (req, res) => {
   try {
+    console.log('🔐 Login request received:', { email: req.body.email });
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('❌ Validation errors:', errors.array());
       return res.status(400).json({
         success: false,
         error: { code: 'VALIDATION_ERROR', message: { en: 'Invalid credentials', hi: 'अमान्य क्रेडेंशियल' } }
@@ -108,6 +132,7 @@ router.post('/login', [
 
     const user = await User.findOne({ email, isActive: true });
     if (!user) {
+      console.log('❌ User not found:', email);
       return res.status(401).json({
         success: false,
         error: { code: 'INVALID_CREDENTIALS', message: { en: 'Invalid email or password', hi: 'अमान्य ईमेल या पासवर्ड' } }
@@ -116,6 +141,7 @@ router.post('/login', [
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
+      console.log('❌ Password mismatch for:', email);
       return res.status(401).json({
         success: false,
         error: { code: 'INVALID_CREDENTIALS', message: { en: 'Invalid email or password', hi: 'अमान्य ईमेल या पासवर्ड' } }
@@ -126,21 +152,37 @@ router.post('/login', [
     await user.save();
 
     const token = generateToken(user._id);
+    const userData = user.toJSON();
+    
+    console.log('✅ Login successful for:', email);
+    console.log('Token generated:', token ? 'Yes' : 'No');
+    console.log('User data:', { id: userData._id, email: userData.email, name: userData.name });
 
-    res.json({
+    // Ensure response is sent with proper headers
+    const responseData = {
       success: true,
       data: {
         token,
-        user: user.toJSON()
+        user: userData
       }
-    });
+    };
+    
+    console.log('Sending response:', JSON.stringify(responseData, null, 2));
+    
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Length', Buffer.byteLength(JSON.stringify(responseData)));
+    res.status(200).json(responseData);
+    
+    console.log('✅ Response sent successfully');
   } catch (error) {
     console.error('❌ Login error:', error);
     console.error('Error stack:', error.stack);
-    res.status(500).json({
+    const errorResponse = {
       success: false,
       error: { code: 'SERVER_ERROR', message: { en: 'Login failed', hi: 'लॉगिन विफल' } }
-    });
+    };
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.status(500).json(errorResponse);
   }
 });
 

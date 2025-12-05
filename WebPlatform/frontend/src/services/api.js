@@ -1,9 +1,20 @@
 import axios from 'axios';
 
-// Use environment variable for production, fallback to proxy for development
-const API_BASE_URL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL}/api`
-  : '/api';
+// Determine API base URL
+// Priority: 1. Environment variable, 2. Production detection, 3. Development proxy
+let API_BASE_URL = '/api'; // Default to proxy for development
+
+if (import.meta.env.VITE_API_URL) {
+  // Use environment variable if set
+  API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
+} else if (import.meta.env.PROD || window.location.hostname !== 'localhost') {
+  // Production: Use backend URL directly
+  API_BASE_URL = 'https://jhariyawatch-backend.onrender.com/api';
+}
+
+console.log('🔧 API Base URL:', API_BASE_URL);
+console.log('🔧 Environment:', import.meta.env.MODE);
+console.log('🔧 VITE_API_URL:', import.meta.env.VITE_API_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -18,6 +29,15 @@ api.interceptors.request.use(
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    // Log request in development
+    if (import.meta.env.DEV) {
+      console.log('📤 API Request:', {
+        method: config.method?.toUpperCase(),
+        url: config.url,
+        baseURL: config.baseURL,
+        fullURL: `${config.baseURL}${config.url}`
+      });
     }
     return config;
   },

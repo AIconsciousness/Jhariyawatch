@@ -6,6 +6,9 @@ Create a `.env` file in `WebPlatform/frontend/` directory with the following con
 
 ```env
 # Backend API URL
+# Development: http://localhost:3001
+# Production: https://jhariyawatch-backend.onrender.com
+# Note: If not set, production will auto-detect and use backend URL
 VITE_API_URL=http://localhost:3001
 
 # Cloudinary Configuration (CONFIGURED ✅)
