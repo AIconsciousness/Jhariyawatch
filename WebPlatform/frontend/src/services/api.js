@@ -4,17 +4,31 @@ import axios from 'axios';
 // Priority: 1. Environment variable, 2. Production detection, 3. Development proxy
 let API_BASE_URL = '/api'; // Default to proxy for development
 
+// Check if we're in production (build mode)
+const isProduction = import.meta.env.PROD || import.meta.env.MODE === 'production';
+
+// Check if we're in browser and not on localhost
+const isProductionHost = typeof window !== 'undefined' && 
+  window.location.hostname !== 'localhost' && 
+  window.location.hostname !== '127.0.0.1';
+
 if (import.meta.env.VITE_API_URL) {
   // Use environment variable if set
   API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
-} else if (import.meta.env.PROD || window.location.hostname !== 'localhost') {
+} else if (isProduction || isProductionHost) {
   // Production: Use backend URL directly
   API_BASE_URL = 'https://jhariyawatch-backend.onrender.com/api';
 }
 
-console.log('🔧 API Base URL:', API_BASE_URL);
-console.log('🔧 Environment:', import.meta.env.MODE);
-console.log('🔧 VITE_API_URL:', import.meta.env.VITE_API_URL);
+// Log configuration (only in browser)
+if (typeof window !== 'undefined') {
+  console.log('🔧 API Configuration:');
+  console.log('  - Base URL:', API_BASE_URL);
+  console.log('  - Environment:', import.meta.env.MODE);
+  console.log('  - Is Production:', isProduction);
+  console.log('  - Hostname:', window.location.hostname);
+  console.log('  - VITE_API_URL:', import.meta.env.VITE_API_URL || 'Not set');
+}
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -30,15 +44,14 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    // Log request in development
-    if (import.meta.env.DEV) {
-      console.log('📤 API Request:', {
-        method: config.method?.toUpperCase(),
-        url: config.url,
-        baseURL: config.baseURL,
-        fullURL: `${config.baseURL}${config.url}`
-      });
-    }
+    // Log request (always log for debugging)
+    const fullURL = `${config.baseURL}${config.url}`;
+    console.log('📤 API Request:', {
+      method: config.method?.toUpperCase(),
+      endpoint: config.url,
+      baseURL: config.baseURL,
+      fullURL: fullURL
+    });
     return config;
   },
   (error) => Promise.reject(error)
@@ -46,47 +59,52 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   (response) => {
-    // Log successful responses in development
-    if (import.meta.env.DEV) {
-      console.log('✅ API Response:', {
-        url: response.config?.url,
-        status: response.status,
-        data: response.data
-      });
-    }
+    // Log successful responses
+    console.log('✅ API Response:', {
+      url: response.config?.url,
+      baseURL: response.config?.baseURL,
+      fullURL: response.config?.baseURL + response.config?.url,
+      status: response.status,
+      data: response.data
+    });
     return response;
   },
   (error) => {
     // Log all errors for debugging
+    console.error('❌ API Error Details:');
+    console.error('  - Message:', error.message);
+    console.error('  - Request URL:', error.config?.baseURL + error.config?.url);
+    console.error('  - Method:', error.config?.method);
+    
     if (error.response) {
       // Server responded with error status
-      console.error('❌ API Error Response:', {
-        status: error.response.status,
-        statusText: error.response.statusText,
-        data: error.response.data,
-        url: error.config?.url,
-        method: error.config?.method,
-        headers: error.response.headers
-      });
+      console.error('  - Status:', error.response.status);
+      console.error('  - Status Text:', error.response.statusText);
+      console.error('  - Response Data:', error.response.data);
+      console.error('  - Response Headers:', error.response.headers);
+      
+      // Special handling for 404
+      if (error.response.status === 404) {
+        console.error('⚠️ 404 Error - Endpoint not found!');
+        console.error('  - Check if backend URL is correct:', error.config?.baseURL);
+        console.error('  - Check if backend is running');
+        console.error('  - Check if route exists:', error.config?.url);
+      }
     } else if (error.request) {
       // Request made but no response received (network error, CORS, etc.)
-      console.error('❌ API Network Error:', {
-        message: error.message,
-        url: error.config?.url,
-        method: error.config?.method,
-        request: error.request,
-        hint: 'Backend server might not be running, CORS issue, or network problem'
-      });
+      console.error('  - Network Error - No response received');
+      console.error('  - Request:', error.request);
+      console.error('  - Hint: Backend server might not be running, CORS issue, or network problem');
     } else {
       // Something else happened
-      console.error('❌ API Error:', error.message, error);
+      console.error('  - Other Error:', error);
     }
     
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       // Don't redirect on login/register pages
-      if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
+      if (typeof window !== 'undefined' && !window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
         window.location.href = '/login';
       }
     }

@@ -39,12 +39,15 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       console.log('🔐 Login attempt:', { email });
+      console.log('📤 Request URL:', api.defaults.baseURL + '/auth/login');
+      
       const response = await api.post('/auth/login', { email, password });
-      console.log('✅ Login response:', JSON.stringify(response.data, null, 2));
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
-      console.log('Response data type:', typeof response.data);
-      console.log('Response data length:', response.data?.length || 'N/A');
+      
+      console.log('✅ Login response received');
+      console.log('  - Status:', response.status);
+      console.log('  - Data:', response.data);
+      console.log('  - Data type:', typeof response.data);
+      console.log('  - Full response:', JSON.stringify(response.data, null, 2));
       
       // Check response structure - handle empty string responses
       if (!response || response.data === undefined || response.data === null) {
